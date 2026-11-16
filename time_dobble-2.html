@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIME DOBBLE - EFL English Time Learning Game</title>
+    <style>
+        :root {
+            --color-red: #AD343E;
+            --color-beige: #E8E0CA;
+            --color-beige-light: #F7F4EB;
+            --color-dark: #363020;
+            --color-white: #FFFFFF;
+            --color-green: #2E7D32;
+            --color-green-light: #E8F5E9;
+            --color-error: #D32F2F;
+            --color-error-light: #FFEBEE;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--color-beige);
+            color: var(--color-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* App Container */
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--color-beige-light);
+            border-radius: 24px;
+            box-shadow: 0 12px 36px rgba(54, 48, 32, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 4px solid var(--color-dark);
+            margin: auto 0;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--color-dark);
+            color: var(--color-white);
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        header h1 span {
+            color: var(--color-red);
+        }
+
+        .badge {
+            background-color: var(--color-red);
+            color: var(--color-white);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            padding: 30px;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Start Screen */
+        .menu-section {
+            background: var(--color-white);
+            border: 2px solid var(--color-dark);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 0 var(--color-dark);
+        }
+
+        .menu-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--color-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+        }
+
+        .option-btn {
+            background-color: var(--color-beige-light);
+            border: 2px solid var(--color-dark);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .option-btn:hover {
+            background-color: var(--color-beige);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected {
+            background-color: var(--color-red);
+            color: var(--color-white);
+            border-color: var(--color-dark);
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.2);
+        }
+
+        .custom-time-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            align-items: center;
+        }
+
+        .custom-time-box input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid var(--color-dark);
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            background: var(--color-white);
+        }
+
+        /* Primary Action Buttons */
+        .btn-primary {
+            background-color: var(--color-red);
+            color: var(--color-white);
+            border: 3px solid var(--color-dark);
+            border-radius: 16px;
+            padding: 16px 32px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--color-dark);
+            transition: all 0.1s ease;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 var(--color-dark);
+        }
+
+        .btn-primary:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--color-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--color-white);
+            color: var(--color-dark);
+            border: 2px solid var(--color-dark);
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--color-dark);
+            transition: all 0.1s ease;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--color-dark);
+        }
+
+        /* Game HUD */
+        .game-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--color-white);
+            padding: 12px 20px;
+            border-radius: 14px;
+            border: 2px solid var(--color-dark);
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timer-display {
+            font-family: monospace;
+            font-size: 1.2rem;
+            background: var(--color-dark);
+            color: var(--color-white);
+            padding: 4px 12px;
+            border-radius: 8px;
+        }
+
+        .timer-warning {
+            background-color: var(--color-red) !important;
+            animation: pulse 0.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        /* Dobble Arena */
+        .dobble-arena {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .dobble-card-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-label {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--color-dark);
+            letter-spacing: 0.5px;
+        }
+
+        /* Circular Dobble Card */
+        .dobble-card {
+            width: 340px;
+            height: 340px;
+            background: var(--color-white);
+            border: 8px solid var(--color-dark);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(54, 48, 32, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 720px) {
+            .dobble-card {
+                width: 280px;
+                height: 280px;
+            }
+            .dobble-arena {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        .dobble-item {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+            border: 2px solid transparent;
+            text-align: center;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .dobble-item:hover {
+            transform: translate(-50%, -50%) scale(1.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+
+        .dobble-item.selected {
+            background-color: var(--color-green-light) !important;
+            color: var(--color-green) !important;
+            border-color: var(--color-green) !important;
+            box-shadow: 0 0 12px rgba(46, 125, 50, 0.4);
+            transform: translate(-50%, -50%) scale(1.05);
+            z-index: 15;
+        }
+
+        .dobble-item.error-shake {
+            background-color: var(--color-error-light) !important;
+            color: var(--color-error) !important;
+            border-color: var(--color-error) !important;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(-50%, -50%) translateX(0); }
+            20%, 60% { transform: translate(-50%, -50%) translateX(-6px); }
+            40%, 80% { transform: translate(-50%, -50%) translateX(6px); }
+        }
+
+        /* Game Footer Controls */
+        .game-footer-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--color-white);
+            padding: 16px 24px;
+            border-radius: 14px;
+            border: 2px solid var(--color-dark);
+        }
+
+        .matches-status {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        /* Results Screen */
+        .results-card {
+            background: var(--color-white);
+            border: 3px solid var(--color-dark);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 6px 0 var(--color-dark);
+        }
+
+        .results-card h2 {
+            font-size: 2rem;
+            color: var(--color-dark);
+            margin-bottom: 15px;
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: var(--color-beige-light);
+            border: 2px solid var(--color-dark);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .stat-box .value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--color-red);
+            margin-top: 5px;
+        }
+
+        .stat-box .label {
+            font-size: 0.9rem;
+            color: var(--color-dark);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .motivational-msg {
+            font-style: italic;
+            font-size: 1.15rem;
+            color: var(--color-dark);
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--color-beige);
+            border-radius: 12px;
+            border-left: 5px solid var(--color-red);
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Instructions box */
+        .rules-box {
+            background: var(--color-white);
+            border: 2px solid var(--color-dark);
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .rules-box ul {
+            margin-left: 20px;
+            margin-top: 6px;
+        }
+
+        /* Time's up banner notification */
+        .alert-banner {
+            background-color: var(--color-error-light);
+            color: var(--color-error);
+            border: 2px solid var(--color-error);
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .audio-toggle {
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--color-white);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <h1>TIME <span>DOBBLE</span></h1>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="audio-toggle" id="audioToggleBtn" title="Toggle Sound">🔊 Sound: ON</button>
+                <div class="badge">EFL A1–A2</div>
+            </div>
+        </header>
+
+        <!-- SCREEN 1: START MENU -->
+        <div id="startScreen" class="screen active">
+            <div class="rules-box">
+                <strong>How to Play:</strong> Find the <strong>two matching times</strong> between Card 1 and Card 2! Click the matching time on both cards. Each item features vibrant colors, unique fun fonts, and perfectly distributed placement! Complete all 15 rounds.
+            </div>
+
+            <div class="menu-section">
+                <h3>🎯 Select Difficulty Level</h3>
+                <div class="options-grid" id="difficultyOptions">
+                    <button class="option-btn selected" data-diff="easy">Easy<br><span style="font-size:0.75rem; font-weight:normal;">Digital Match</span></button>
+                    <button class="option-btn" data-diff="medium">Medium<br><span style="font-size:0.75rem; font-weight:normal;">Visual Fonts & Tilt</span></button>
+                    <button class="option-btn" data-diff="hard">Hard<br><span style="font-size:0.75rem; font-weight:normal;">Digital & Words</span></button>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h3>⏱️ Round Duration</h3>
+                <div class="options-grid" id="durationOptions">
+                    <button class="option-btn" data-time="15">15 sec</button>
+                    <button class="option-btn" data-time="30">30 sec</button>
+                    <button class="option-btn selected" data-time="45">45 sec</button>
+                    <button class="option-btn" data-time="60">60 sec</button>
+                    <button class="option-btn" data-time="90">90 sec</button>
+                    <button class="option-btn" data-time="0">Unlimited</button>
+                </div>
+                <div class="custom-time-box">
+                    <input type="number" id="customTimeInput" min="10" max="180" placeholder="Custom seconds (10 - 180)...">
+                    <button class="btn-secondary" id="setCustomTimeBtn">Set Custom</button>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="startBtn">Start Game 🚀</button>
+        </div>
+
+        <!-- SCREEN 2: GAMEPLAY SCREEN -->
+        <div id="gameScreen" class="screen">
+            <!-- HUD -->
+            <div class="game-hud">
+                <div class="hud-item">
+                    <span>Round:</span> <strong id="currentRoundText">1</strong> / 15
+                </div>
+                <div class="hud-item">
+                    <span>Timer:</span> <div class="timer-display" id="timerDisplay">45s</div>
+                </div>
+                <div class="hud-item">
+                    <span>Score:</span> <strong id="scoreText">0</strong> pts
+                </div>
+            </div>
+
+            <div class="alert-banner" id="timesUpBanner">⏰ TIME'S UP! Click NEXT ROUND to continue.</div>
+
+            <!-- Dobble Arena -->
+            <div class="dobble-arena">
+                <div class="dobble-card-wrapper">
+                    <div class="card-label">Card 1</div>
+                    <div class="dobble-card" id="card1"></div>
+                </div>
+                <div class="dobble-card-wrapper">
+                    <div class="card-label">Card 2</div>
+                    <div class="dobble-card" id="card2"></div>
+                </div>
+            </div>
+
+            <!-- Footer Bar -->
+            <div class="game-footer-bar">
+                <div class="matches-status" id="matchesStatusText">Pairs found: 0 / 2</div>
+                <button class="btn-primary" id="nextRoundBtn" disabled style="opacity: 0.5; cursor: not-allowed; padding: 12px 24px; font-size: 1rem;">Next Round ➔</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: RESULTS SCREEN -->
+        <div id="resultsScreen" class="screen">
+            <div class="results-card">
+                <h2>🏆 Game Completed!</h2>
+                <p>Amazing job practicing your English telling the time!</p>
+                
+                <div class="results-stats">
+                    <div class="stat-box">
+                        <div class="label">Total Matched Pairs</div>
+                        <div class="value" id="resPairs">28 / 30</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Mistakes</div>
+                        <div class="value" id="resErrors" style="color: #D32F2F;">3</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Success Rate</div>
+                        <div class="value" id="resPercentage" style="color: #2E7D32;">93%</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Difficulty</div>
+                        <div class="value" id="resDifficulty" style="font-size: 1.4rem;">Medium</div>
+                    </div>
+                </div>
+
+                <div class="motivational-msg" id="motivationalMsg">
+                    "Fantastic work! You are becoming a true master of telling the time in English!"
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn-primary" id="playAgainBtn">Play Again 🔄</button>
+                    <button class="btn-secondary" id="menuBtn">Main Menu 🏠</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================
+           TIME DOBBLE - GAME LOGIC & UNIFORM LAYOUT ENGINE
+           ========================================================== */
+
+        // 1. Time Corpus & Canonical Definition (12 hours x 4 minute values = 48 items)
+        const HOURS = [
+            { h: 1, word: 'one' }, { h: 2, word: 'two' }, { h: 3, word: 'three' },
+            { h: 4, word: 'four' }, { h: 5, word: 'five' }, { h: 6, word: 'six' },
+            { h: 7, word: 'seven' }, { h: 8, word: 'eight' }, { h: 9, word: 'nine' },
+            { h: 10, word: 'ten' }, { h: 11, word: 'eleven' }, { h: 12, word: 'twelve' }
+        ];
+
+        const MINUTE_MODES = [
+            { m: 0, suffix: "o'clock" },
+            { m: 15, suffix: "quarter past" },
+            { m: 30, suffix: "half past" },
+            { m: 45, suffix: "quarter to" }
+        ];
+
+        // Rich robust font family pool for distinct styling
+        const FONT_POOL = [
+            'Impact, sans-serif',
+            'Courier New, monospace',
+            'Georgia, serif',
+            'Comic Sans MS, cursive',
+            'Trebuchet MS, sans-serif',
+            'Arial Black, sans-serif',
+            'Verdana, sans-serif',
+            'Brush Script MT, cursive',
+            'Times New Roman, serif',
+            'Lucida Console, monospace',
+            'Trebuchet MS, sans-serif'
+        ];
+
+        // Vibrant color palette for items
+        const COLOR_POOL = [
+            '#AD343E', '#1B4D3E', '#1D3557', '#6A0DAD', '#B5651D',
+            '#0077B6', '#D90429', '#2B9348', '#560BAD', '#F77F00',
+            '#4361EE', '#7209B7', '#3A0CA3', '#F72585', '#4CC9F0'
+        ];
+
+        // Generate all 48 canonical times
+        function generateCanonicalCorpus() {
+            const corpus = [];
+            let idCounter = 1;
+            HOURS.forEach(hourObj => {
+                MINUTE_MODES.forEach(minObj => {
+                    let digitalStr = `${hourObj.h}:${minObj.m === 0 ? '00' : minObj.m}`;
+                    let wordStr = "";
+                    
+                    if (minObj.m === 0) {
+                        wordStr = `${hourObj.word} o'clock`;
+                    } else if (minObj.m === 15) {
+                        wordStr = `quarter past ${hourObj.word}`;
+                    } else if (minObj.m === 30) {
+                        wordStr = `half past ${hourObj.word}`;
+                    } else if (minObj.m === 45) {
+                        let nextHIdx = hourObj.h % 12;
+                        let nextHourWord = HOURS[nextHIdx].word;
+                        wordStr = `quarter to ${nextHourWord}`;
+                    }
+
+                    corpus.push({
+                        id: idCounter++,
+                        hour: hourObj.h,
+                        minute: minObj.m,
+                        digital: digitalStr,
+                        word: wordStr
+                    });
+                });
+            });
+            return corpus;
+        }
+
+        const FULL_CORPUS = generateCanonicalCorpus();
+
+        // 2. Audio Synthesizer (Web Audio API)
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                const now = ctx.currentTime;
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.setValueAtTime(140, now + 0.1);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(400, now);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'win') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        g.gain.setValueAtTime(0.15, now + idx * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.3);
+                        o.start(now + idx * 0.1);
+                        o.stop(now + idx * 0.1 + 0.3);
+                    });
+                }
+            } catch (e) {
+                console.warn("Audio Context error:", e);
+            }
+        }
+
+        // 3. Game State
+        const STATE = {
+            difficulty: 'easy',
+            duration: 45,
+            currentRound: 1,
+            maxRounds: 15,
+            score: 0,
+            errors: 0,
+            startTime: 0,
+            elapsedTimer: 0,
+            roundTimer: null,
+            timeLeft: 45,
+            
+            card1Items: [],
+            card2Items: [],
+            commonIds: [],
+            foundMatches: 0,
+            selectedCard1Id: null,
+            selectedCard2Id: null,
+            roundFinished: false,
+            gameTimerInterval: null
+        };
+
+        const screens = {
+            start: document.getElementById('startScreen'),
+            game: document.getElementById('gameScreen'),
+            results: document.getElementById('resultsScreen')
+        };
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function randomRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        /**
+         * Generates strictly uniform non-overlapping polar coordinates inside a circular card.
+         * Guarantees 1 center item and 8 outer ring items evenly spaced with jitter for natural look.
+         */
+        function generateUniformCircularPositions(count) {
+            const positions = [];
+            const center = 50;
+
+            // 1. Center item
+            positions.push({ x: center, y: center });
+
+            // 2. Outer 8 items evenly distributed in a ring with safe padding from borders
+            const outerCount = count - 1;
+            const ringRadius = 31; // Percentage from center, keeping well inside the 50% border boundary
+
+            // Shuffle starting angle offset per card to avoid any patterns across rounds
+            const angleOffset = Math.random() * 2 * Math.PI;
+
+            for (let i = 0; i < outerCount; i++) {
+                const baseAngle = angleOffset + (i * 2 * Math.PI / outerCount);
+                // Add slight angular and radial jitter so it looks organic yet evenly spread
+                const angleJitter = randomRange(-0.25, 0.25);
+                const radiusJitter = randomRange(-3.5, 3.5);
+
+                const finalAngle = baseAngle + angleJitter;
+                const finalRadius = Math.max(22, Math.min(36, ringRadius + radiusJitter));
+
+                const x = center + finalRadius * Math.cos(finalAngle);
+                const y = center + finalRadius * Math.sin(finalAngle);
+                positions.push({ x, y });
+            }
+
+            return positions;
+        }
+
+        // 4. Round Generation & Styling
+        function prepareRoundData() {
+            const shuffledCorpus = shuffleArray(FULL_CORPUS);
+            const commonTimes = [shuffledCorpus[0], shuffledCorpus[1]];
+            const commonIds = commonTimes.map(t => t.id);
+
+            const remainingForCard1 = shuffleArray(shuffledCorpus.slice(2));
+            const card1Unique = remainingForCard1.slice(0, 7);
+            const card1Canonical = [...commonTimes, ...card1Unique];
+
+            const remainingForCard2 = shuffleArray(remainingForCard1.slice(7));
+            const card2Unique = remainingForCard2.slice(0, 7);
+            const card2Canonical = [...commonTimes, ...card2Unique];
+
+            const shuffledCard1 = shuffleArray(card1Canonical);
+            const shuffledCard2 = shuffleArray(card2Canonical);
+
+            STATE.commonIds = commonIds;
+            STATE.card1Items = buildVisualItems(shuffledCard1, STATE.difficulty);
+            STATE.card2Items = buildVisualItems(shuffledCard2, STATE.difficulty);
+            STATE.foundMatches = 0;
+            STATE.selectedCard1Id = null;
+            STATE.selectedCard2Id = null;
+            STATE.roundFinished = false;
+        }
+
+        function buildVisualItems(canonicalList, difficulty) {
+            const positions = generateUniformCircularPositions(canonicalList.length);
+            
+            const shuffledFonts = shuffleArray(FONT_POOL);
+            const shuffledColors = shuffleArray(COLOR_POOL);
+
+            return canonicalList.map((item, index) => {
+                let displayString = item.digital;
+                let rotation = 0;
+                let fontSize = '1rem';
+                let fontColor = '#363020';
+                let fontFamily = shuffledFonts[index % shuffledFonts.length];
+
+                fontColor = shuffledColors[index % shuffledColors.length];
+
+                if (difficulty === 'easy') {
+                    rotation = randomRange(-4, 4);
+                    fontSize = '1.1rem';
+                } else if (difficulty === 'medium') {
+                    rotation = randomRange(-35, 35);
+                    fontSize = randomRange(0.85, 1.2) + 'rem';
+                } else if (difficulty === 'hard') {
+                    const useWord = Math.random() < 0.5;
+                    displayString = useWord ? item.word : item.digital;
+                    rotation = randomRange(-30, 30);
+                    fontSize = useWord ? '0.78rem' : randomRange(0.85, 1.15) + 'rem';
+                }
+
+                return {
+                    canonicalId: item.id,
+                    display: displayString,
+                    x: positions[index].x,
+                    y: positions[index].y,
+                    rotation: rotation,
+                    fontSize: fontSize,
+                    color: fontColor,
+                    fontFamily: fontFamily,
+                    isMatched: false
+                };
+            });
+        }
+
+        // 5. Render Round to DOM
+        function renderRound() {
+            document.getElementById('currentRoundText').textContent = STATE.currentRound;
+            document.getElementById('scoreText').textContent = STATE.score;
+            document.getElementById('matchesStatusText').textContent = `Pairs found: ${STATE.foundMatches} / 2`;
+            document.getElementById('timesUpBanner').style.display = 'none';
+
+            const nextBtn = document.getElementById('nextRoundBtn');
+            nextBtn.disabled = true;
+            nextBtn.style.opacity = '0.5';
+            nextBtn.style.cursor = 'not-allowed';
+
+            renderCard('card1', STATE.card1Items, 1);
+            renderCard('card2', STATE.card2Items, 2);
+        }
+
+        function renderCard(containerId, items, cardIndex) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            items.forEach((item) => {
+                const el = document.createElement('div');
+                el.className = 'dobble-item';
+                if (item.isMatched) {
+                    el.classList.add('selected');
+                }
+                el.textContent = item.display;
+                el.style.left = `${item.x}%`;
+                el.style.top = `${item.y}%`;
+                el.style.transform = `translate(-50%, -50%) rotate(${item.rotation}deg)`;
+                el.style.fontSize = item.fontSize;
+                el.style.color = item.color;
+                el.style.fontFamily = item.fontFamily;
+                el.style.background = item.isMatched ? 'var(--color-green-light)' : 'var(--color-white)';
+
+                el.addEventListener('click', () => handleItemClick(cardIndex, item.canonicalId, el));
+                el.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleItemClick(cardIndex, item.canonicalId, el);
+                }, { passive: false });
+
+                container.appendChild(el);
+            });
+        }
+
+        // 6. Interaction & Verification Logic
+        function handleItemClick(cardIndex, canonicalId, elementEl) {
+            if (STATE.roundFinished) return;
+
+            playSound('click');
+
+            if (cardIndex === 1) {
+                if (STATE.card1Items.find(i => i.canonicalId === canonicalId)?.isMatched) return;
+
+                document.querySelectorAll('#card1 .dobble-item').forEach((el, idx) => {
+                    if (!STATE.card1Items[idx].isMatched) {
+                        el.classList.remove('selected', 'error-shake');
+                    }
+                });
+                STATE.selectedCard1Id = canonicalId;
+                elementEl.classList.add('selected');
+            } else {
+                if (STATE.card2Items.find(i => i.canonicalId === canonicalId)?.isMatched) return;
+
+                document.querySelectorAll('#card2 .dobble-item').forEach((el, idx) => {
+                    if (!STATE.card2Items[idx].isMatched) {
+                        el.classList.remove('selected', 'error-shake');
+                    }
+                });
+                STATE.selectedCard2Id = canonicalId;
+                elementEl.classList.add('selected');
+            }
+
+            if (STATE.selectedCard1Id !== null && STATE.selectedCard2Id !== null) {
+                verifySelection();
+            }
+        }
+
+        function verifySelection() {
+            const id1 = STATE.selectedCard1Id;
+            const id2 = STATE.selectedCard2Id;
+
+            STATE.selectedCard1Id = null;
+            STATE.selectedCard2Id = null;
+
+            if (id1 === id2 && STATE.commonIds.includes(id1)) {
+                const c1Item = STATE.card1Items.find(i => i.canonicalId === id1);
+                if (!c1Item.isMatched) {
+                    STATE.card1Items.forEach(i => { if (i.canonicalId === id1) i.isMatched = true; });
+                    STATE.card2Items.forEach(i => { if (i.canonicalId === id1) i.isMatched = true; });
+
+                    STATE.foundMatches++;
+                    STATE.score += 10;
+                    playSound('correct');
+
+                    renderCard('card1', STATE.card1Items, 1);
+                    renderCard('card2', STATE.card2Items, 2);
+                    document.getElementById('scoreText').textContent = STATE.score;
+                    document.getElementById('matchesStatusText').textContent = `Pairs found: ${STATE.foundMatches} / 2`;
+
+                    if (STATE.foundMatches === 2) {
+                        completeRoundSuccess();
+                    }
+                    return;
+                }
+            }
+
+            STATE.errors++;
+            playSound('error');
+
+            document.querySelectorAll('.dobble-item.selected').forEach(el => {
+                if (!el.style.backgroundColor.includes('E8F5E9')) {
+                    el.classList.add('error-shake');
+                    setTimeout(() => {
+                        el.classList.remove('selected', 'error-shake');
+                    }, 400);
+                }
+            });
+
+            STATE.card1Items.forEach(i => { if (!i.isMatched) i.selected = false; });
+            STATE.card2Items.forEach(i => { if (!i.isMatched) i.selected = false; });
+        }
+
+        function completeRoundSuccess() {
+            STATE.roundFinished = true;
+            if (STATE.roundTimer) clearInterval(STATE.roundTimer);
+            playSound('win');
+
+            const nextBtn = document.getElementById('nextRoundBtn');
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+            nextBtn.style.cursor = 'pointer';
+        }
+
+        // 7. Timer Handling
+        function startRoundTimer() {
+            if (STATE.duration === 0) {
+                document.getElementById('timerDisplay').textContent = '∞';
+                return;
+            }
+
+            STATE.timeLeft = STATE.duration;
+            updateTimerDisplay();
+
+            if (STATE.roundTimer) clearInterval(STATE.roundTimer);
+
+            STATE.roundTimer = setInterval(() => {
+                STATE.timeLeft--;
+                updateTimerDisplay();
+
+                if (STATE.timeLeft <= 0) {
+                    clearInterval(STATE.roundTimer);
+                    handleTimesUp();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const display = document.getElementById('timerDisplay');
+            display.textContent = `${STATE.timeLeft}s`;
+            if (STATE.timeLeft <= 10) {
+                display.classList.add('timer-warning');
+            } else {
+                display.classList.remove('timer-warning');
+            }
+        }
+
+        function handleTimesUp() {
+            STATE.roundFinished = true;
+            document.getElementById('timesUpBanner').style.display = 'block';
+            playSound('error');
+
+            const nextBtn = document.getElementById('nextRoundBtn');
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+            nextBtn.style.cursor = 'pointer';
+        }
+
+        // 8. Navigation & Game Flow
+        function startGame() {
+            STATE.currentRound = 1;
+            STATE.score = 0;
+            STATE.errors = 0;
+            STATE.elapsedTimer = 0;
+            STATE.startTime = Date.now();
+
+            if (STATE.gameTimerInterval) clearInterval(STATE.gameTimerInterval);
+            STATE.gameTimerInterval = setInterval(() => {
+                STATE.elapsedTimer++;
+            }, 1000);
+
+            switchScreen('game');
+            loadNewRound();
+        }
+
+        function loadNewRound() {
+            prepareRoundData();
+            renderRound();
+            startRoundTimer();
+        }
+
+        function nextRound() {
+            if (STATE.currentRound < STATE.maxRounds) {
+                STATE.currentRound++;
+                loadNewRound();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            if (STATE.roundTimer) clearInterval(STATE.roundTimer);
+            if (STATE.gameTimerInterval) clearInterval(STATE.gameTimerInterval);
+            playSound('win');
+
+            const totalPairsFound = Math.round(STATE.score / 10);
+            const maxPairs = STATE.maxRounds * 2;
+            const pct = Math.round((totalPairsFound / maxPairs) * 100);
+
+            document.getElementById('resPairs').textContent = `${totalPairsFound} / ${maxPairs}`;
+            document.getElementById('resErrors').textContent = STATE.errors;
+            document.getElementById('resPercentage').textContent = `${pct}%`;
+            
+            let diffName = 'Easy';
+            if (STATE.difficulty === 'medium') diffName = 'Medium';
+            if (STATE.difficulty === 'hard') diffName = 'Hard';
+            document.getElementById('resDifficulty').textContent = diffName;
+
+            const msgEl = document.getElementById('motivationalMsg');
+            if (pct >= 90) {
+                msgEl.textContent = `"Outstanding! You are a brilliant time-telling champion in English!"`;
+            } else if (pct >= 70) {
+                msgEl.textContent = `"Great job! Your English time skills are getting stronger every round!"`;
+            } else {
+                msgEl.textContent = `"Good effort! Keep practicing o'clock, quarter past, half past, and quarter to!"`;
+            }
+
+            switchScreen('results');
+        }
+
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            if (screens[screenName]) {
+                screens[screenName].classList.add('active');
+            }
+        }
+
+        // 9. Event Listeners Setup
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#difficultyOptions .option-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#difficultyOptions .option-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    STATE.difficulty = btn.getAttribute('data-diff');
+                });
+            });
+
+            document.querySelectorAll('#durationOptions .option-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#durationOptions .option-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    STATE.duration = parseInt(btn.getAttribute('data-time'), 10);
+                    document.getElementById('customTimeInput').value = '';
+                });
+            });
+
+            document.getElementById('setCustomTimeBtn').addEventListener('click', () => {
+                const val = parseInt(document.getElementById('customTimeInput').value, 10);
+                if (!isNaN(val) && val >= 10 && val <= 180) {
+                    document.querySelectorAll('#durationOptions .option-btn').forEach(b => b.classList.remove('selected'));
+                    STATE.duration = val;
+                    playSound('click');
+                } else {
+                    alert('Please enter a duration between 10 and 180 seconds.');
+                }
+            });
+
+            document.getElementById('startBtn').addEventListener('click', () => {
+                playSound('click');
+                startGame();
+            });
+
+            document.getElementById('nextRoundBtn').addEventListener('click', () => {
+                playSound('click');
+                nextRound();
+            });
+
+            document.getElementById('playAgainBtn').addEventListener('click', () => {
+                playSound('click');
+                startGame();
+            });
+
+            document.getElementById('menuBtn').addEventListener('click', () => {
+                playSound('click');
+                switchScreen('start');
+            });
+
+            document.getElementById('audioToggleBtn').addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                const btn = document.getElementById('audioToggleBtn');
+                btn.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+                if (soundEnabled) playSound('click');
+            });
+        });
+    </script>
+</body>
+</html>
